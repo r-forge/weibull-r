@@ -14,9 +14,7 @@
 // abremDebias code
 RcppExport SEXP MLEloglike(SEXP arg1, SEXP arg3, SEXP arg5, SEXP arg6);
 RcppExport SEXP MLEsimplex(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5);
-// used in secant method for determination of 3rd parameter optimization
-//RcppExport SEXP MLEdMaxLLdx(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4);
-//******************//
+
 
 RcppExport SEXP LSLR(SEXP arg1);
 RcppExport SEXP pivotalMC(SEXP arg1);

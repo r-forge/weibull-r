@@ -1,6 +1,6 @@
 ## options.wblr.R
 ## Refactored from options.abrem.R originally authored by Jurgen Symynck
-## (c) 2014-2017 OpenReliability.org
+## (c) 2014-2021 OpenReliability.org
 ##-------------------------------------------------------------------------------
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,11 +59,11 @@ options.wblr<- function(...){
 
 ## options specific to wblr.conf
             method.conf="pivotal-rr",           ## ("bbb","bbb-extra", "fm", "fmbounds","lrb", "likelihood-ratio")
-											## "mcpivotals" has been depreciated
-           num_dq=25,
-           dq="abrem",
-        ##   assigning dq="user" permits defined user_dq to be applied.  minitab dq exampled here:
-           user_dq=c(seq(.01,.09,by=.01),seq(.10,.90,by=.10),seq(.91,.99, by=.01)),
+			## "mcpivotals" has been depreciated
+           num_dp=25,
+           dp="abrem",			##("minitab", "supersmith", "user")
+        ##   assigning dp="user" permits defined user_dq to be applied.  minitab dp exampled here:
+           user_dp=c(seq(.01,.09,by=.01),seq(.10,.90,by=.10),seq(.91,.99, by=.01)),
         ## double-sided confidence interval, also chi sq conf level for likelihood ratio
            ci=0.9,
         ## probability points at which to report Blife on legend
@@ -76,6 +76,8 @@ options.wblr<- function(...){
         ## specific control for likelihood ratio contour and bounds
             dof=1,            ## degrees of freedom, dof=1 for conf interval, dof=2 for comparison
             ptDensity=120, ##  number of points in likelihood ratio contour
+			RadLimit=1e-5,  ## a convergence limit for the contour radials based on specific units such as Eta/Eta_hat and Beta/Beta_hat.
+			tzpoints=c(10, 10, 1), ## control prospective threashold cases to consider for 3p bounds (see Details in LRbounds man page)
 
 ## General graphical options
         ## graphical control for fitted lines, confidence bounds, or contours can be set at

@@ -8,7 +8,7 @@
 
 \usage{
 LRbounds(x,  dist="weibull", CL=0.9, unrel=NULL,  contour=NULL, dof=1,
-                ptDensity=120, debias="none", show=FALSE)
+                control=NULL, debias="none", show=c(FALSE,FALSE))
 }
 
 \arguments{
@@ -29,11 +29,18 @@ LRbounds(x,  dist="weibull", CL=0.9, unrel=NULL,  contour=NULL, dof=1,
   \item{dof}{An integer value indicating degrees of freedom to apply to the Chi square test, which defaults to dof=1 for
   confidence interval bound use. Should be set to 2 for comparison of two models each with 2 parameters.
   }
-  \item{ptDensity}{an integer value for the number of points to be plotted around the circumference of the contour.}
-  \item{debias}{A place holder for an optional string argument indicating the adjustment to be applied to the shape or standard deviation
-  parameter of the fitted data. NOT YET IMPLEMEMENTED - see details.
+  \item{control}{ A list having specifically named options for control of the bounds preparation. List item 'ptDensity' 
+  an integer value for the number of points to be plotted around the circumference of the (each) 2p contour. List item
+  'tzpoints' controls the number of t0 trials in a 3p iteration (see Details). List item RadLimit a convergence limit
+  for the contour radials based on specific units such as Eta/Eta_hat and Beta/Beta_hat.
   }
-   \item{show}{A logical determining whether a crude graphic of the bounds shall be displayed.
+  \item{debias}{A place holder for an optional string argument indicating the adjustment to be applied to the shape or standard deviation
+  parameter of the fitted data.
+  }
+   \item{show}{A vector of logicals determining whether and how a graphic of the bounds shall be displayed.
+   For 2-parameter bounds only the first element is considered and a crude graphic is provided for the bounds.
+   For 3-parameter bounds the first element determines whether a wblr graphic is displayed for the bounds, while
+   the second element determines whether the series of contours generated to develop the bounds is displayed.
   } 
 }
 
@@ -41,10 +48,18 @@ LRbounds(x,  dist="weibull", CL=0.9, unrel=NULL,  contour=NULL, dof=1,
   Returns a dataframe holding values of percentiles, lower, datum, and upper values of the bound.
 }
 
-\details{
-  An "observed" information matrix is derived numerically as the hessian by means of optimHess.  From the variance-covariance matrix (inverse of the hessian) variation of life(-time) at given quantiles is determined.
-  
-  Some commercial softwares apply a modification of the LR bounds based on the application of a bias adjustment. Abernethy's "Justified Likelihood Function" has not been demonstrated to be academically accepted, so no attempt has been made to implement similar modification.
+\details{  
+  The approach used for 3p bounds has been to vary the threshold value through a selection of increments from the optimized MLE toward zero.
+  Then 2-parameter contours based on a likelihood ratio determined from the optimized MLE are plotted as if looking down
+  on a 3 dimensional plot with threshold values in the z-direction. The bounds are then derived from the farthest extent of all the contours.
+  tzpoints is a control argument that can be used to alter the number of threshold values (tz's) to be sampled. The tzpoints
+  control argument is a vector having 3 elements. The first element controls the number of positive tz values to be sampled.
+  The second and third elements of the tzpoints vector control the sequence of negative tz values according to the relationship
+  tzpoints_neg<-seq(tzpoints[3],tzpoints[2], by=tzpoints[3]).
+
+  A bias adjustment, if specified, is applied to the shape parameter of generated contours. In this way such
+  adjustment is passed into the bounds preparation.Abernethy's "Justified Likelihood Function" has not been demonstrated 
+  to be academically accepted. For this reason no attempt has been made to implement similar modification related to bias adjustment.
   Contribution of evidence or a method contrary to this position will gladly be reviewed by the package maintainer.
 }
 
@@ -61,5 +76,3 @@ set.seed(4321)
 data<-rlnorm(30,2,1.2)
 bounds<-LRbounds(mleframe(data[7:30],data[1:6]), dist="lognormal")
 }
-
-\keyword{ regression reliability }

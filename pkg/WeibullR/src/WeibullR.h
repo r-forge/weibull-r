@@ -14,7 +14,9 @@
 // abremDebias code
 RcppExport SEXP MLEloglike(SEXP arg1, SEXP arg3, SEXP arg5, SEXP arg6);
 RcppExport SEXP MLEsimplex(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5);
-
+// used in secant method for determination of 3rd parameter optimization
+//RcppExport SEXP MLEdMaxLLdx(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4);
+//******************//
 
 RcppExport SEXP LSLR(SEXP arg1);
 RcppExport SEXP pivotalMC(SEXP arg1);
@@ -32,10 +34,10 @@ RcppExport SEXP plotData(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5, 
 // contour code
 RcppExport SEXP getContour(SEXP arg1, SEXP arg2, SEXP arg4, SEXP arg5, SEXP arg6, SEXP arg7);
 // MLE 3p code
-RcppExport SEXP callMLE3p(SEXP arg1,  SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5);
-	     //SEXP callMLE3p(SEXP arg1,  SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5) {		//implementation
+RcppExport SEXP callMLE3p(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5);
+	     //SEXP callMLE3p(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5) {		//implementation
 
-//extern "C" void R_init_WeibullR(DllInfo* info);
+extern "C" void R_init_WeibullR(DllInfo* info);
 
 #endif
 #endif

@@ -141,9 +141,10 @@ plot.wblr <- function(x,...){
         if(!is.null(wblr$fit)){
 ##            ret <- lapply(wblr$fit,plotConfsInFit,opadata=wblr$options,...)
             ret <- lapply(wblr$fit,plotConfsInFit,opadata=wblr$options,dotargs)
-        }else{
-            message("plotConfs: This wblr object contains no fits" )
-        }
+		}
+        #}else{
+        #    message("plotConfs: This wblr object contains no fits" )
+        #}
     }
     lapply(x,plotConfs)
 
@@ -234,7 +235,7 @@ plot.wblr <- function(x,...){
         }else{
             if(wblr$options$is.plot.legend && opa$is.plot.legend){
                 ret <- list(buildSingleDataLegend(wblr,opadata=wblr$options,...))
-                if(!is.null(opa)) warning("buildListOfLegends: This wblr object contains no fits.")
+                #if(!is.null(opa)) warning("buildListOfLegends: This wblr object contains no fits.")
             }
         }
         ret

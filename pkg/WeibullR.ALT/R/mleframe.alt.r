@@ -225,92 +225,111 @@ if(!is.null(interval)) {
 			}
 		}
 
+## initialize possible interval categories			
+		fail_intervals<-NULL	
+		susp_intervals<-NULL	
+		true_intervals<-interval[which(interval$right-interval$left>0),]	
 		if(any((interval$right-interval$left)<=0))  {
-			true_intervals<-interval[which(interval$right-interval$left>0),]
 			fail_intervals<-interval[which(interval$right==interval$left),]
-			susp_intervals<-interval[which(interval$right-interval$left<0),]
-			interval<-true_intervals
-		}
-## Now procede with original interval handler code
-
-## add qty column if not provided
-		if(ncol(interval)<3)  {
-
-			ivalchar<- apply(interval,2,as.character)
-			ivalstr<-paste0(ivalchar[,1],"_",ivalchar[,2])
-			ivaldf<-as.data.frame(table(ivalstr))
-			ivalstr2<-as.character(levels(ivaldf[,1]))
-## much done here, but this returns the tabled left and right columns
-## in a dataframe with rows corresponding to the tabled quantities
-			lrdf<-data.frame(
-				matrix(
-					as.numeric(
-						unlist(
-							strsplit(ivalstr2,"_")
-						)
-					)
-				,ncol=2, byrow=T
-				)
-			)
-## now just complete the consolidation of duplicates in the interval dataframe
-			intervals<-cbind(lrdf,ivaldf[,2])
-			names(intervals)<-c("left","right","qty")
-
-			# interval<- cbind(interval, qty=c(rep(1,nrow(interval))))
-		} else{
-## here is the place to process true_intervals (as interval) for duplicate entries
-			intervals<-interval
-## sort to facilitate to assure uniform presentation and consolidation of any duplicated entries
-##  only required for dataframe with qty field
-			NDX<-order(intervals$left,intervals$right)
-			intervals<-intervals[NDX,]
-
-			interval_test<-paste(as.character(intervals$left), as.character(intervals$right))
-			if(length(unique(interval_test)) < length(interval_test))  {
-				drop_rows<-NULL
-				for(frow in nrow(intervals): 2)  {
-					if((intervals[frow,1] == intervals[frow-1,1])  && (intervals[frow,2] == intervals[frow-1,2])) {
-						drop_rows<-c(drop_rows, frow)
-						intervals[frow-1,3] <- intervals[frow-1,3] + intervals[frow,3]
-					}
-				}
-				intervals<-intervals[-drop_rows,]
+			susp_intervals<-interval[which(interval$right-interval$left<0),]		
+			if(any(susp_intervals$right>0)) {	
+				stop("error in interval data, right less than left, but not less than or equal 0")
+			}else{	
+				susp_intervals$right<-rep(-1, nrow(susp_intervals))
 			}
 		}
+		
+## test whether any true_intervals were found
+		if(nrow(true_intervals)>0) {
+			interval<-true_intervals
+## Now procede with original interval handler code
+## add qty column if not provided
+			if(ncol(interval)<3)  {
+				if(nrow(interval)>1)  {					
+					ivalchar<- apply(interval,2,as.character)				
+					ivalstr<-paste0(ivalchar[,1],"_",ivalchar[,2])				
+					ivaldf<-as.data.frame(table(ivalstr))				
+					ivalstr2<-as.character(levels(ivaldf[,1]))				
+## much done here, but this returns the tabled left and right columns								
+## in a dataframe with rows corresponding to the tabled quantities								
+					lrdf<-data.frame(				
+						matrix(			
+							as.numeric(		
+								unlist(	
+									strsplit(ivalstr2,"_")
+								)	
+							)		
+						,ncol=2, byrow=T			
+						)			
+					)				
+					intervals<-cbind(lrdf,ivaldf[,2])				
+					names(intervals)<-c("left","right","qty")				
+				}else{					
+					intervals<-cbind(interval, qty=1)				
+				}
+				
+			}else{
+## now just complete the consolidation of duplicates in the interval dataframe
+				intervals<-interval
+## sort to facilitate to assure uniform presentation and consolidation of any duplicated entries
+##  only required for dataframe with qty field
+				NDX<-order(intervals$left,intervals$right)
+				intervals<-intervals[NDX,]
 
-
-## finally, reject any other object type but NULL
-	}else{
-		if(!is.null(interval))  {
-			stop("error in interval argument type")
+				interval_test<-paste(as.character(intervals$left), as.character(intervals$right))
+				if(length(unique(interval_test)) < length(interval_test))  {
+					drop_rows<-NULL
+					for(frow in nrow(intervals): 2)  {
+						if((intervals[frow,1] == intervals[frow-1,1])  && (intervals[frow,2] == intervals[frow-1,2])) {
+							drop_rows<-c(drop_rows, frow)
+							intervals[frow-1,3] <- intervals[frow-1,3] + intervals[frow,3]
+						}
+					}
+					intervals<-intervals[-drop_rows,]
+				}
+			}
+		}else{
+## this completes the test that no true_intervals were found, setting output intervals to NULL
+			intervals<-NULL
 		}
+
+## finally, reject any object type that is not dataframe (we are within a test for !is.null)
+	}else{
+		#if(!is.null(interval))  {
+			stop("error in interval argument type")
+		#}
 	}
 
 
 
 ## test whether fail_intervals were found
-	if(length(fail_intervals)>0) {
+	if(!is.null(nrow(fail_intervals))) {
+	if(nrow(fail_intervals)>0) {
 ## this code will rarely ever be called
 ## add qty column if not provided
 		if(ncol(fail_intervals)<3)  {
-			ivalchar<- apply(fail_intervals,2,as.character)
-			ivalstr<-paste0(ivalchar[,1],"_",ivalchar[,2])
-			ivaldf<-as.data.frame(table(ivalstr))
-			ivalstr2<-as.character(levels(ivaldf[,1]))
-## much done here, but this returns the tabled left and right columns
-## in a dataframe with rows corresponding to the tabled quantities
-			lrdf<-data.frame(
-				matrix(
-					as.numeric(
-						unlist(
-							strsplit(ivalstr2,"_")
-						)
-					)
-				,ncol=2, byrow=T
-				)
-			)
-			fail_intervals<-cbind(lrdf,ivaldf[,2])
-			names(fail_intervals)<-c("left","right","qty")
+			if(nrow(fail_intervals)>1)  {						
+				ivalchar<- apply(fail_intervals,2,as.character)					
+				 ivalstr<-paste0(ivalchar[,1],"_",ivalchar[,2])					
+				ivaldf<-as.data.frame(table(ivalstr))					
+				ivalstr2<-as.character(levels(ivaldf[,1]))					
+## much done here, but this returns the tabled left and right columns									
+## in a dataframe with rows corresponding to the tabled quantities									
+				lrdf<-data.frame(					
+					matrix(				
+						as.numeric(			
+							unlist(		
+								strsplit(ivalstr2,"_")	
+							)		
+						)			
+					,ncol=2, byrow=T				
+					)				
+				)					
+				fail_intervals<-cbind(lrdf,ivaldf[,2])					
+				names(fail_intervals)<-c("left","right","qty")					
+			}else{						
+				fail_intervals<-cbind(fail_intervals, qty=1)					
+			}
 		}
 
 		## actually rets$failures could be NULL and ignored by rbind
@@ -336,31 +355,36 @@ if(!is.null(interval)) {
 ## since intervals have been defined, must prepare for return of faiilures already found
 		failures<-rets$failures
 	}
+	} # close the test for no fail_intervals found 
 
-
-
-	if(length(susp_intervals>0)) {
+	if(!is.null(nrow(susp_intervals))) {
+	if(nrow(susp_intervals)>0) {
 ## this code will rarely ever be called
 ## add qty column if not provided
 		if(ncol(susp_intervals)<3)  {
-			ivalchar<- apply(susp_intervals,2,as.character)
-			ivalstr<-paste0(ivalchar[,1],"_",ivalchar[,2])
-			ivaldf<-as.data.frame(table(ivalstr))
-			ivalstr2<-as.character(levels(ivaldf[,1]))
-## much done here, but this returns the tabled left and right columns
-## in a dataframe with rows corresponding to the tabled quantities
-			lrdf<-data.frame(
-				matrix(
-					as.numeric(
-						unlist(
-							strsplit(ivalstr2,"_")
-						)
-					)
-				,ncol=2, byrow=T
-				)
-			)
-			susp_intervals<-cbind(lrdf,ivaldf[,2])
-			names(susp_intervals)<-c("left","right","qty")
+			if(nrow(susp_intervals)>1)  {					
+				ivalchar<- apply(susp_intervals,2,as.character)				
+				ivalstr<-paste0(ivalchar[,1],"_",ivalchar[,2])				
+				ivaldf<-as.data.frame(table(ivalstr))				
+				ivalstr2<-as.character(levels(ivaldf[,1]))				
+## much done here, but this returns the tabled left and right columns								
+## in a dataframe with rows corresponding to the tabled quantities								
+				lrdf<-data.frame(				
+					matrix(			
+						as.numeric(		
+							unlist(	
+								strsplit(ivalstr2,"_")
+							)	
+						)		
+					,ncol=2, byrow=T			
+					)			
+				)				
+				susp_intervals<-cbind(lrdf,ivaldf[,2])				
+				names(susp_intervals)<-c("left","right","qty")				
+			}else{					
+				susp_intervals<-cbind(susp_intervals, qty=1)				
+			}					
+
 		}
 
 			## actually rets$suspensions could be NULL and will be ignored by rbind
@@ -385,9 +409,16 @@ if(!is.null(interval)) {
 ## since intervals have been defined, must prepare for return of suspensions already found
 		suspensions<-rets$suspensions
 	}
+	} #close the test for no susp_intervals found
 
-
-
+if(!exists("failures")) {
+		## actually rets$failures could be NULL and ignored by rbind
+			failures<-rbind(fail_intervals, rets$failures)
+}
+if(!exists("suspensions")) {
+		## actually rets$suspensions could be NULL and will be ignored by rbind
+			suspensions<-rbind(susp_intervals, rets$suspensions)
+}
 	ret<-list(failures=failures, suspensions=suspensions, intervals=intervals)
 
 }else{
@@ -398,5 +429,3 @@ if(!is.null(interval)) {
 
 ret
 }
-
-

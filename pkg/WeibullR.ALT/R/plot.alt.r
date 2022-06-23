@@ -63,7 +63,7 @@ plot.alt <- function(x,...){
     # +--------------------------+
     # |  create new plot canvas  |
     # +--------------------------+
-    ra <- findrange(x)	
+    ra <- findrange.alt(x)	
 	ylimits <- range(ra$yrange,na.rm=TRUE)					
 	ylim <- c(10^(floor(log10(ylimits[1])-0.5)),					
 	            10^(ceiling(log10(ylimits[2])+.5)))					
@@ -77,7 +77,7 @@ plot.alt <- function(x,...){
 	 plotargs <- c(list(x=NA,axes=FALSE),					
 		list(xlim=xlim, ylim=ylim, log=log, 				
 		xlab=opa$xlab, ylab=opa$ylab, main=main))
-	if(opa$plot.in.Rmarkdown==FALSE) {
+	if(opa$suppress.dev.new==FALSE) {
 		dev.new(width=opa$dev.width, height=opa$dev.height)
 	}
 	do.call(plot.default,plotargs)					
@@ -267,11 +267,11 @@ points2plot<-function(x, jf=.001)  {
 				## excluding suspensions		
 				if(  x$data[[set]]$data$right[li] - x$data[[set]]$data$left[li] > 0 )  {		
 					time<-c(time, (x$data[[set]]$data$left[li] + x$data[[set]]$data$right[li])/2)	
-					stress<-c(stress, x$data[[set]]$stress)	
+					stress<-c(stress, x$data[[set]]$stress[1])	
 				}		
 				if(  x$data[[set]]$data$right[li] - x$data[[set]]$data$left[li] == 0 )  {		
 					time<-c(time, x$data[[set]]$data$left[li])	
-					stress<-c(stress, x$data[[set]]$stress)	
+					stress<-c(stress, x$data[[set]]$stress[1])	
 				}		
 						
 			}			
@@ -280,11 +280,11 @@ points2plot<-function(x, jf=.001)  {
 				## excluding suspensions		
 				if(  x$data[[set]]$data$right[li] - x$data[[set]]$data$left[li] > 0 )  {		
 					time<-c(time, rep((x$data[[set]]$data$left[li] + x$data[[set]]$data$right[li])/2, x$data[[set]]$data$qty[li]))	
-					stress<-c(stress, qjitter(x$data[[set]]$stress,  x$data[[set]]$data$qty[li], jf))	
+					stress<-c(stress, qjitter(x$data[[set]]$stress[1],  x$data[[set]]$data$qty[li], jf))	
 				}		
 				if(  x$data[[set]]$data$right[li] - x$data[[set]]$data$left[li] == 0 )  {		
 					time<-c(time, rep(x$data[[set]]$data$left[li], x$data[[set]]$data$qty[li]))	
-					stress<-c(stress, qjitter(x$data[[set]]$stress,  x$data[[set]]$data$qty[li], jf))	
+					stress<-c(stress, qjitter(x$data[[set]]$stress[1],  x$data[[set]]$data$qty[li], jf))	
 				}		
 						
 			}			
